@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DragonFly BSD Ports Coordinator</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🐉 DragonFly BSD Ports Coordinator</h1>
+            <p>Coordinate development of broken ports</p>
+        </header>
+
+        <main>
+            <div class="stats">
+                <div class="stat-card">
+                    <h3>Total Ports</h3>
+                    <span id="total-ports">0</span>
+                </div>
+                <div class="stat-card">
+                    <h3>Locked Ports</h3>
+                    <span id="locked-ports">0</span>
+                </div>
+                <div class="stat-card">
+                    <h3>Available Ports</h3>
+                    <span id="available-ports">0</span>
+                </div>
+            </div>
+
+            <div class="ports-section">
+                <h2>Broken Ports</h2>
+                <div class="filters">
+                    <input type="text" id="search" placeholder="Search ports...">
+                    <select id="category-filter">
+                        <option value="">All Categories</option>
+                    </select>
+                    <select id="status-filter">
+                        <option value="">All Status</option>
+                        <option value="available">Available</option>
+                        <option value="locked">Locked</option>
+                    </select>
+                </div>
+                <div id="ports-grid" class="ports-grid"></div>
+            </div>
+        </main>
+
+        <!-- Lock Port Modal -->
+        <div id="lock-modal" class="modal">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <h2>Lock Port</h2>
+                <form id="lock-form">
+                    <input type="hidden" id="port-id">
+                    <div class="form-group">
+                        <label for="developer-name">Developer Name:</label>
+                        <input type="text" id="developer-name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="developer-id">GitHub Username:</label>
+                        <input type="text" id="developer-id" required>
+                    </div>
+                    <button type="submit">Lock Port</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/js/app.js"></script>
+</body>
+</html>
