@@ -1,4 +1,4 @@
-module coordination-system
+module dporter
 
 go 1.21
 
