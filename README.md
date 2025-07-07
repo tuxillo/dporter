@@ -16,6 +16,7 @@ A web-based coordination system for managing DragonFly BSD port development, pre
 
 - Go 1.21 or later
 - Git
+- Node.js and npm
 
 ### Installation
 
@@ -23,6 +24,11 @@ A web-based coordination system for managing DragonFly BSD port development, pre
 ```bash
 git clone https://github.com/DragonFlyBSD/DeltaPorts.git
 cd DeltaPorts/dporter
+```
+
+2. Start the server (compiles the TypeScript frontend automatically):
+```bash
+make run
 ```
 
 ### Branding Assets

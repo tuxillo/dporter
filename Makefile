@@ -1,10 +1,13 @@
-.PHONY: run build test lint
+.PHONY: run build build-frontend test lint
 
-run:
+run: build-frontend
 	cd backend && go run .
 
-build:
+build: build-frontend
 	cd backend && go build -o ../dporter
+
+build-frontend:
+	npx tsc
 
 lint:
 	cd backend && go vet ./...
