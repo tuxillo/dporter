@@ -3,103 +3,98 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DragonFly BSD Ports Coordinator</title>
-    <link rel="icon" href="/static/img/favicon.ico">
-    <link rel="stylesheet" href="/static/css/style.css">
+    <title>DPorts Coordinator</title>
+    <link rel="stylesheet" href="static/css/style.css">
 </head>
 <body>
-    <div class="admin-container">
-        <aside class="sidebar">
-            <h2>Ports Admin</h2>
-            <nav>
-                <ul>
-                    <li><a href="#">Dashboard</a></li>
-                    <li><a href="#">Ports</a></li>
-                    <li><a href="#">Settings</a></li>
-                </ul>
-            </nav>
-        </aside>
-        <div class="container">
+    <div class="container">
         <header>
-            <h1><img src="/static/img/logo.png" alt="DragonFly BSD logo" class="logo"> DragonFly BSD Ports Coordinator</h1>
-            <p>Coordinate development of broken ports</p>
+            <h1>DPorts Coordination System</h1>
+            <div id="current-user" class="user-info">Loading user...</div>
         </header>
 
-        <main>
-            <div class="stats">
-                <div class="stat-card">
-                    <h3>Total Ports</h3>
-                    <span id="total-ports">0</span>
-                </div>
-                <div class="stat-card">
-                    <h3>Locked Ports</h3>
-                    <span id="locked-ports">0</span>
-                </div>
-                <div class="stat-card">
-                    <h3>Available Ports</h3>
-                    <span id="available-ports">0</span>
-                </div>
+        <div class="controls">
+            <div class="search-filters">
+                <input type="text" id="search" placeholder="Search ports..." class="search-input">
+                <select id="category-filter" class="filter-select">
+                    <option value="">All Categories</option>
+                </select>
+                <select id="status-filter" class="filter-select">
+                    <option value="">All Status</option>
+                    <option value="available">Available</option>
+                    <option value="locked">Locked</option>
+                </select>
             </div>
+            
+            <div class="view-controls">
+                <button id="card-view-btn" class="btn btn-secondary">Card View</button>
+                <button id="table-view-btn" class="btn btn-secondary">Table View</button>
+            </div>
+        </div>
 
-            <div class="ports-section">
-                <h2>Broken Ports</h2>
-                <div class="filters">
-                    <input type="text" id="search" placeholder="Search ports...">
-                    <select id="category-filter">
-                        <option value="">All Categories</option>
-                    </select>
-                    <select id="status-filter">
-                        <option value="">All Status</option>
-                        <option value="available">Available</option>
-                        <option value="locked">Locked</option>
-                    </select>
-                </div>
-                <div class="view-toggle">
-                    <button id="card-view-btn" class="btn btn-secondary">Card View</button>
-                    <button id="table-view-btn" class="btn btn-secondary">Table View</button>
-                </div>
-                <div id="ports-grid" class="ports-grid"></div>
-                <div id="ports-table-section" style="display:none;">
-                    <table id="ports-table">
-                        <thead>
-                            <tr>
-                                <th>Name</th>
-                                <th>Category</th>
-                                <th>Description</th>
-                                <th>Status</th>
-                                <th>Action</th>
-                            </tr>
-                        </thead>
-                        <tbody></tbody>
-                    </table>
-                    <div id="pagination" class="pagination">
-                        <button id="prev-page" class="btn btn-secondary">Prev</button>
-                        <span id="page-info"></span>
-                        <button id="next-page" class="btn btn-secondary">Next</button>
-                    </div>
-                </div>
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-number" id="total-ports">0</div>
+                <div class="stat-label">Total Ports</div>
             </div>
-        </main>
-      <!-- Lock Port Modal -->
-      <div id="lock-modal" class="modal">
-          <div class="modal-content">
-              <span class="close">&times;</span>
-              <h2>Lock Port</h2>
-              <form id="lock-form">
-                  <input type="hidden" id="port-id">
-                  <div class="form-group">
-                      <label for="developer-id">Developer:</label>
-                      <select id="developer-id" required>
-                          <option value="">Select a developer...</option>
-                      </select>
-                  </div>
-                  <button type="submit" class="btn btn-primary">Lock Port</button>
-              </form>
-          </div>
-      </div>
+            <div class="stat-card">
+                <div class="stat-number" id="available-ports">0</div>
+                <div class="stat-label">Available</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="locked-ports">0</div>
+                <div class="stat-label">Locked</div>
+            </div>
+        </div>
+
+        <div id="ports-grid" class="ports-grid"></div>
+
+        <div id="ports-table-section" class="table-section" style="display: none;">
+            <table id="ports-table" class="ports-table">
+                <thead>
+                    <tr>
+                        <th>Port Name</th>
+                        <th>Category</th>
+                        <th>Description</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+            <div class="pagination">
+                <button id="prev-page" class="btn btn-secondary">Previous</button>
+                <span id="page-info">1 / 1</span>
+                <button id="next-page" class="btn btn-secondary">Next</button>
+            </div>
+        </div>
     </div>
-</div>
 
-    <script src="/static/js/app.js"></script>
+    <!-- Enhanced Lock Modal -->
+    <div id="lock-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Lock Port</h3>
+                <span class="close">&times;</span>
+            </div>
+            <form id="lock-form">
+                <input type="hidden" id="port-id">
+                
+                <div class="form-group">
+                    <label for="user-select">Select User:</label>
+                    <select id="user-select" class="form-control" required>
+                        <option value="">Loading users...</option>
+                    </select>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">Lock Port</button>
+                    <button type="button" class="btn btn-secondary" onclick="document.getElementById('lock-modal').style.display='none'">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script type="module" src="static/js/app.js"></script>
 </body>
 </html>
