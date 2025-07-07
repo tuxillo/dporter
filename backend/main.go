@@ -35,6 +35,7 @@ func main() {
 	api := r.Group("/api/v1")
 	{
 		api.GET("/ports", getPorts)
+		api.GET("/ports_paginated", getPaginatedPorts)
 		api.POST("/ports/:id/lock", lockPort)
 		api.DELETE("/ports/:id/lock", unlockPort)
 		api.GET("/ports/:id/status", getPortStatus)

@@ -2,6 +2,7 @@ package main
 
 import (
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -11,6 +12,32 @@ func getPorts(c *gin.Context) {
 	var ports []Port
 	db.Preload("Lock").Find(&ports)
 	c.JSON(http.StatusOK, ports)
+}
+
+func getPaginatedPorts(c *gin.Context) {
+	pageStr := c.DefaultQuery("page", "1")
+	limitStr := c.DefaultQuery("limit", "20")
+
+	page, err := strconv.Atoi(pageStr)
+	if err != nil || page < 1 {
+		page = 1
+	}
+
+	limit, err := strconv.Atoi(limitStr)
+	if err != nil || limit < 1 {
+		limit = 20
+	}
+
+	var total int64
+	db.Model(&Port{}).Count(&total)
+
+	var ports []Port
+	db.Preload("Lock").Offset((page - 1) * limit).Limit(limit).Find(&ports)
+
+	c.JSON(http.StatusOK, gin.H{
+		"ports": ports,
+		"total": total,
+	})
 }
 
 func lockPort(c *gin.Context) {

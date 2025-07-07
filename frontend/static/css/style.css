@@ -188,6 +188,34 @@ header h1 {
     background: #555;
 }
 
+.view-toggle {
+    margin-bottom: 15px;
+}
+
+#ports-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+#ports-table th,
+#ports-table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+}
+
+#ports-table th {
+    background: #f2f2f2;
+}
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    margin-top: 10px;
+}
+
 .modal {
     display: none;
     position: fixed;
