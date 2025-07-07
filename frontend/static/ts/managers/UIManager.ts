@@ -2,16 +2,19 @@ import { Port, User } from '../types/index.js';
 import { StateManager } from './StateManager.js';
 import { UserManager } from './UserManager.js';
 import { PortManager } from './PortManager.js';
+import { NotificationManager } from '../utils/notifications.js';
 
 export class UIManager {
     private stateManager: StateManager;
     private userManager: UserManager;
     private portManager: PortManager;
+    private notifications: NotificationManager;
 
     constructor(stateManager: StateManager, userManager: UserManager, portManager: PortManager) {
         this.stateManager = stateManager;
         this.userManager = userManager;
         this.portManager = portManager;
+        this.notifications = new NotificationManager();
         
         this.setupEventListeners();
         this.subscribeToStateChanges();
@@ -76,11 +79,23 @@ export class UIManager {
         
         tableViewBtn?.addEventListener('click', () => {
             this.switchToTableView();
+            this.updateViewButtonStates('table');
         });
 
         cardViewBtn?.addEventListener('click', () => {
             this.switchToCardView();
+            this.updateViewButtonStates('card');
         });
+    }
+
+    private updateViewButtonStates(activeView: 'card' | 'table'): void {
+        const tableViewBtn = document.getElementById('table-view-btn') as HTMLElement;
+        const cardViewBtn = document.getElementById('card-view-btn') as HTMLElement;
+        
+        if (tableViewBtn && cardViewBtn) {
+            tableViewBtn.classList.toggle('active', activeView === 'table');
+            cardViewBtn.classList.toggle('active', activeView === 'card');
+        }
     }
 
     private setupPaginationEvents(): void {
@@ -133,7 +148,7 @@ export class UIManager {
         if (!select) return;
 
         const { categories } = this.stateManager.getState();
-        select.innerHTML = '<option value="">All Categories</option>';
+        select.innerHTML = '<option value="">📁 All Categories</option>';
         
         [...categories].sort().forEach(category => {
             const option = document.createElement('option');
@@ -169,7 +184,7 @@ export class UIManager {
 
         const currentUser = this.userManager.getCurrentUser();
         if (currentUser) {
-            userDisplay.textContent = `Logged in as: ${currentUser.name}`;
+            userDisplay.textContent = `${currentUser.name} (@${currentUser.username})`;
         } else {
             userDisplay.textContent = 'No user selected';
         }
@@ -182,10 +197,25 @@ export class UIManager {
 
         grid.innerHTML = '';
 
+        if (filteredPorts.length === 0) {
+            this.renderEmptyState(grid);
+            return;
+        }
+
         filteredPorts.forEach(port => {
             const portCard = this.createPortCard(port);
             grid.appendChild(portCard);
         });
+    }
+
+    private renderEmptyState(container: HTMLElement): void {
+        container.innerHTML = `
+            <div class="empty-state">
+                <div class="empty-icon">📦</div>
+                <h3>No ports found</h3>
+                <p>Try adjusting your search filters to find what you're looking for.</p>
+            </div>
+        `;
     }
 
     private createPortCard(port: Port): HTMLElement {
@@ -194,18 +224,18 @@ export class UIManager {
 
         const lockInfo = port.lock ? `
             <div class="lock-info">
-                <strong>Locked by:</strong> ${port.lock.developer_name}<br>
-                <strong>Since:</strong> ${new Date(port.lock.locked_at).toLocaleDateString()}
+                <strong>🔒 Locked by:</strong> ${port.lock.developer_name}<br>
+                <strong>📅 Since:</strong> ${new Date(port.lock.locked_at).toLocaleDateString()}
             </div>
         ` : '';
 
         const actions = port.lock ? `
-            <button class="btn btn-secondary" onclick="window.coordinator.unlockPort(${port.id})">
-                Unlock Port
+            <button class="btn btn-danger" onclick="window.coordinator.unlockPort(${port.id})">
+                🔓 Unlock Port
             </button>
         ` : `
             <button class="btn btn-primary" onclick="window.coordinator.showLockModal(${port.id})">
-                Lock Port
+                🔒 Lock Port
             </button>
         `;
 
@@ -213,7 +243,7 @@ export class UIManager {
             <div class="port-header">
                 <div class="port-name">${port.name}</div>
                 <div class="port-status status-${port.lock ? 'locked' : 'available'}">
-                    ${port.lock ? 'Locked' : 'Available'}
+                    ${port.lock ? '🔒 Locked' : '✅ Available'}
                 </div>
             </div>
             <div class="port-category">${port.category}</div>
@@ -234,6 +264,20 @@ export class UIManager {
         const { paginatedPorts } = this.stateManager.getState();
         tbody.innerHTML = '';
         
+        if (paginatedPorts.length === 0) {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td colspan="5" class="empty-table">
+                    <div class="empty-state">
+                        <div class="empty-icon">📦</div>
+                        <p>No ports to display</p>
+                    </div>
+                </td>
+            `;
+            tbody.appendChild(row);
+            return;
+        }
+        
         paginatedPorts.forEach(port => {
             const row = this.createPortTableRow(port);
             tbody.appendChild(row);
@@ -243,14 +287,18 @@ export class UIManager {
     private createPortTableRow(port: Port): HTMLTableRowElement {
         const row = document.createElement('tr');
         const action = port.lock ?
-            `<button class="btn btn-secondary" onclick="window.coordinator.unlockPort(${port.id})">Unlock</button>` :
-            `<button class="btn btn-primary" onclick="window.coordinator.showLockModal(${port.id})">Lock</button>`;
+            `<button class="btn btn-danger" onclick="window.coordinator.unlockPort(${port.id})">🔓 Unlock</button>` :
+            `<button class="btn btn-primary" onclick="window.coordinator.showLockModal(${port.id})">🔒 Lock</button>`;
             
         row.innerHTML = `
-            <td>${port.name}</td>
+            <td><code>${port.name}</code></td>
             <td>${port.category}</td>
             <td>${port.description}</td>
-            <td>${port.lock ? 'Locked' : 'Available'}</td>
+            <td>
+                <span class="status-badge status-${port.lock ? 'locked' : 'available'}">
+                    ${port.lock ? '🔒 Locked' : '✅ Available'}
+                </span>
+            </td>
             <td>${action}</td>
         `;
         return row;
@@ -264,7 +312,7 @@ export class UIManager {
         const prevBtn = document.getElementById('prev-page') as HTMLButtonElement;
         const nextBtn = document.getElementById('next-page') as HTMLButtonElement;
 
-        if (pageInfo) pageInfo.textContent = `${pagination.page} / ${totalPages}`;
+        if (pageInfo) pageInfo.textContent = `Page ${pagination.page} of ${totalPages}`;
         if (prevBtn) prevBtn.disabled = pagination.page <= 1;
         if (nextBtn) nextBtn.disabled = pagination.page >= totalPages;
     }
@@ -308,12 +356,17 @@ export class UIManager {
         const portId = parseInt(portIdInput.value);
         const username = userSelect.value;
 
+        if (!username) {
+            this.notifications.error('Please select a user');
+            return;
+        }
+
         try {
             await this.portManager.lockPort(portId, username);
             this.hideModal();
-            this.showSuccessMessage('Port locked successfully!');
+            this.notifications.success('Port locked successfully! 🎉');
         } catch (error) {
-            this.showErrorMessage(`Error: ${error instanceof Error ? error.message : 'Unknown error'}`);
+            this.notifications.error(`Failed to lock port: ${error instanceof Error ? error.message : 'Unknown error'}`);
         }
     }
 
@@ -333,13 +386,5 @@ export class UIManager {
         
         if (tableSection) tableSection.style.display = 'none';
         if (portsGrid) portsGrid.style.display = 'grid';
-    }
-
-    private showSuccessMessage(message: string): void {
-        alert(message); // You can replace this with a better notification system
-    }
-
-    private showErrorMessage(message: string): void {
-        alert(message); // You can replace this with a better notification system
     }
 }

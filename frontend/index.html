@@ -3,32 +3,40 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DPorts Coordinator</title>
-    <link rel="stylesheet" href="static/css/style.css">
+    <title>DPorts Coordinator | DragonFly BSD</title>
+    <link rel="stylesheet" href="static/css/styles.css">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐉</text></svg>">
 </head>
 <body>
     <div class="container">
         <header>
-            <h1>DPorts Coordination System</h1>
+            <div class="header-content">
+                <h1>🐉 DPorts Coordinator</h1>
+                <p class="header-subtitle">DragonFly BSD Ports Management System</p>
+            </div>
             <div id="current-user" class="user-info">Loading user...</div>
         </header>
 
         <div class="controls">
             <div class="search-filters">
-                <input type="text" id="search" placeholder="Search ports..." class="search-input">
+                <input type="text" id="search" placeholder="🔍 Search ports by name or description..." class="search-input">
                 <select id="category-filter" class="filter-select">
-                    <option value="">All Categories</option>
+                    <option value="">📁 All Categories</option>
                 </select>
                 <select id="status-filter" class="filter-select">
-                    <option value="">All Status</option>
-                    <option value="available">Available</option>
-                    <option value="locked">Locked</option>
+                    <option value="">📊 All Status</option>
+                    <option value="available">✅ Available</option>
+                    <option value="locked">🔒 Locked</option>
                 </select>
             </div>
             
             <div class="view-controls">
-                <button id="card-view-btn" class="btn btn-secondary">Card View</button>
-                <button id="table-view-btn" class="btn btn-secondary">Table View</button>
+                <button id="card-view-btn" class="btn btn-secondary active">
+                    📱 Cards
+                </button>
+                <button id="table-view-btn" class="btn btn-secondary">
+                    📋 Table
+                </button>
             </div>
         </div>
 
@@ -53,19 +61,19 @@
             <table id="ports-table" class="ports-table">
                 <thead>
                     <tr>
-                        <th>Port Name</th>
-                        <th>Category</th>
-                        <th>Description</th>
-                        <th>Status</th>
-                        <th>Actions</th>
+                        <th>📦 Port Name</th>
+                        <th>📁 Category</th>
+                        <th>📄 Description</th>
+                        <th>🔄 Status</th>
+                        <th>⚡ Actions</th>
                     </tr>
                 </thead>
                 <tbody></tbody>
             </table>
             <div class="pagination">
-                <button id="prev-page" class="btn btn-secondary">Previous</button>
+                <button id="prev-page" class="btn btn-secondary">← Previous</button>
                 <span id="page-info">1 / 1</span>
-                <button id="next-page" class="btn btn-secondary">Next</button>
+                <button id="next-page" class="btn btn-secondary">Next →</button>
             </div>
         </div>
     </div>
@@ -74,22 +82,27 @@
     <div id="lock-modal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h3>Lock Port</h3>
+                <h3>🔒 Lock Port</h3>
                 <span class="close">&times;</span>
             </div>
             <form id="lock-form">
                 <input type="hidden" id="port-id">
                 
                 <div class="form-group">
-                    <label for="user-select">Select User:</label>
+                    <label for="user-select">👤 Select Developer:</label>
                     <select id="user-select" class="form-control" required>
                         <option value="">Loading users...</option>
                     </select>
+                    <small class="form-help">Choose the developer who will work on this port</small>
                 </div>
                 
                 <div class="form-actions">
-                    <button type="submit" class="btn btn-primary">Lock Port</button>
-                    <button type="button" class="btn btn-secondary" onclick="document.getElementById('lock-modal').style.display='none'">Cancel</button>
+                    <button type="button" class="btn btn-secondary" onclick="document.getElementById('lock-modal').style.display='none'">
+                        Cancel
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        🔒 Lock Port
+                    </button>
                 </div>
             </form>
         </div>
