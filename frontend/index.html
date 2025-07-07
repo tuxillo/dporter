@@ -42,7 +42,30 @@
                         <option value="locked">Locked</option>
                     </select>
                 </div>
+                <div class="view-toggle">
+                    <button id="card-view-btn" class="btn btn-secondary">Card View</button>
+                    <button id="table-view-btn" class="btn btn-secondary">Table View</button>
+                </div>
                 <div id="ports-grid" class="ports-grid"></div>
+                <div id="ports-table-section" style="display:none;">
+                    <table id="ports-table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Category</th>
+                                <th>Description</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                    <div id="pagination" class="pagination">
+                        <button id="prev-page" class="btn btn-secondary">Prev</button>
+                        <span id="page-info"></span>
+                        <button id="next-page" class="btn btn-secondary">Next</button>
+                    </div>
+                </div>
             </div>
         </main>
 

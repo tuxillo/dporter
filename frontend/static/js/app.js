@@ -2,11 +2,16 @@ class PortsCoordinator {
     constructor() {
         this.ports = [];
         this.categories = new Set();
+        this.paginatedPorts = [];
+        this.tableLimit = 20;
+        this.tablePage = 1;
+        this.tableTotal = 0;
         this.init();
     }
 
     async init() {
         await this.loadPorts();
+        await this.loadPaginatedPorts();
         this.setupEventListeners();
         this.renderPorts();
         this.updateStats();
@@ -29,6 +34,20 @@ class PortsCoordinator {
             this.updateCategoryFilter();
         } catch (error) {
             console.error('Failed to load ports:', error);
+        }
+    }
+
+    async loadPaginatedPorts(page = this.tablePage) {
+        try {
+            const response = await fetch(`/api/v1/ports_paginated?page=${page}&limit=${this.tableLimit}`);
+            const data = await response.json();
+            this.paginatedPorts = data.ports;
+            this.tableTotal = data.total;
+            this.tablePage = page;
+            this.renderTable();
+            this.updatePagination();
+        } catch (error) {
+            console.error('Failed to load paginated ports:', error);
         }
     }
 
@@ -65,6 +84,30 @@ class PortsCoordinator {
         document.getElementById('lock-form').addEventListener('submit', (e) => {
             e.preventDefault();
             this.lockPort();
+        });
+
+        document.getElementById('table-view-btn').addEventListener('click', () => {
+            document.getElementById('ports-grid').style.display = 'none';
+            document.getElementById('ports-table-section').style.display = 'block';
+            this.loadPaginatedPorts();
+        });
+
+        document.getElementById('card-view-btn').addEventListener('click', () => {
+            document.getElementById('ports-table-section').style.display = 'none';
+            document.getElementById('ports-grid').style.display = 'grid';
+        });
+
+        document.getElementById('prev-page').addEventListener('click', () => {
+            if (this.tablePage > 1) {
+                this.loadPaginatedPorts(this.tablePage - 1);
+            }
+        });
+
+        document.getElementById('next-page').addEventListener('click', () => {
+            const totalPages = Math.ceil(this.tableTotal / this.tableLimit);
+            if (this.tablePage < totalPages) {
+                this.loadPaginatedPorts(this.tablePage + 1);
+            }
         });
     }
 
@@ -142,6 +185,37 @@ class PortsCoordinator {
         `;
 
         return card;
+    }
+
+    createPortTableRow(port) {
+        const row = document.createElement('tr');
+        const action = port.lock ?
+            `<button class="btn btn-secondary" onclick="coordinator.unlockPort(${port.id})">Unlock</button>` :
+            `<button class="btn btn-primary" onclick="coordinator.showLockModal(${port.id})">Lock</button>`;
+        row.innerHTML = `
+            <td>${port.name}</td>
+            <td>${port.category}</td>
+            <td>${port.description}</td>
+            <td>${port.lock ? 'Locked' : 'Available'}</td>
+            <td>${action}</td>
+        `;
+        return row;
+    }
+
+    renderTable() {
+        const tbody = document.querySelector('#ports-table tbody');
+        tbody.innerHTML = '';
+        this.paginatedPorts.forEach(port => {
+            const row = this.createPortTableRow(port);
+            tbody.appendChild(row);
+        });
+    }
+
+    updatePagination() {
+        const totalPages = Math.ceil(this.tableTotal / this.tableLimit) || 1;
+        document.getElementById('page-info').textContent = `${this.tablePage} / ${totalPages}`;
+        document.getElementById('prev-page').disabled = this.tablePage <= 1;
+        document.getElementById('next-page').disabled = this.tablePage >= totalPages;
     }
 
     updateStats() {
@@ -223,6 +297,9 @@ class PortsCoordinator {
                 this.renderPorts();
                 this.updateStats();
             });
+            if (document.getElementById('ports-table-section').style.display !== 'none') {
+                this.loadPaginatedPorts();
+            }
         }, 30000);
     }
 }
