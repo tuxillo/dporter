@@ -4,6 +4,21 @@ import (
 	"time"
 )
 
+// Add User model
+type User struct {
+	ID        uint      `json:"id" gorm:"primaryKey"`
+	Username  string    `json:"username" gorm:"unique;not null"` // GitHub username
+	Name      string    `json:"name"`
+	Email     string    `json:"email"`
+	AvatarURL string    `json:"avatar_url"`
+	Active    bool      `json:"active" gorm:"default:true"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
+
+	// Relations
+	Locks []Lock `json:"locks,omitempty" gorm:"foreignKey:DeveloperID;references:Username"`
+}
+
 type Port struct {
 	ID          uint      `json:"id" gorm:"primaryKey"`
 	Name        string    `json:"name" gorm:"unique;not null"`
