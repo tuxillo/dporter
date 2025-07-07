@@ -14,7 +14,7 @@ var db *gorm.DB
 func main() {
 	// Initialize database
 	var err error
-	db, err = gorm.Open(sqlite.Open("coordination.db"), &gorm.Config{})
+	db, err = gorm.Open(sqlite.Open("dporter.db"), &gorm.Config{})
 	if err != nil {
 		log.Fatal("Failed to connect to database:", err)
 	}
