@@ -25,3 +25,12 @@ git clone https://github.com/DragonFlyBSD/DeltaPorts.git
 cd DeltaPorts/dporter
 ```
 
+### Branding Assets
+
+The frontend expects `frontend/static/img/logo.png` and `frontend/static/img/favicon.ico`. You can download the official images from the DragonFly BSD website:
+
+1. Visit <https://www.dragonflybsd.org/> and save the site logo as `logo.png`.
+2. Download <https://www.dragonflybsd.org/favicon.ico> and save it as `favicon.ico`.
+
+Place these files in `frontend/static/img/` after cloning the repository.
+
